@@ -92,12 +92,14 @@ class Button():
 
         # get mouse position
         pos = pygame.mouse.get_pos()
-
+        key = pygame.key.get_pressed()
         # check mouseover and clicked conditions
         if self.rect.collidepoint(pos): # when the mouse if over the restart button
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False: # [0] = left mouse button clicked
                 action = True
                 self.clicked = True
+        elif key[pygame.K_SPACE]:
+            action = True
 
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
@@ -125,11 +127,11 @@ class Player():
                 self.jumped = True
             if key[pygame.K_SPACE] == False:
                 self.jumped = False
-            if key[pygame.K_LEFT]:
+            if key[pygame.K_LEFT] or key[pygame.K_a]:
                 dx -= 5
                 self.counter += 1
                 self.direction = -1
-            if key[pygame.K_RIGHT]:
+            if key[pygame.K_RIGHT] or key[pygame.K_d]:
                 dx += 5
                 self.counter += 1
                 self.direction = 1
