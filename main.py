@@ -17,7 +17,7 @@ screen_width = 1000
 screen_height = 1000
 
 #  creates screen
-screen = pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
 pygame.display.set_caption('Platformer')
 
 #define font
@@ -25,7 +25,7 @@ font = pygame.font.SysFont('Bauhaus 93', 70)
 font_score = pygame.font.SysFont('Bauhaus 93', 30)
 
 #  define game variables
-tile_size = 50
+tile_size = screen_width/20
 game_over = 0 # -1 = lost, 0 = nothing, 1 = won
 main_menu = True
 level = 0
@@ -452,11 +452,18 @@ while run:
                     world = reset_level(level)  # deletes past level and creates new level then new world
                     game_over = 0
                     score = 0
-
+    pygame.event.pump()
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT:  # quits game when close window button(X) is clicked
             run = False
-
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE: # quits game when esc is pressed
+                run = False
+        elif event.type == VIDEORESIZE: # non fullscreen resizing
+            screen.blit(pygame.transform.scale(bg_img, event.dict['size']), (0, 0))
+        elif event.type == VIDEOEXPOSE: # handles window minimising/maximising
+            screen.fill((0, 0, 0))
+            screen.blit(pygame.transform.scale(bg_img, screen.get_size()), (0, 0))
     pygame.display.update()
 
 pygame.quit()
