@@ -21,8 +21,8 @@ screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE
 pygame.display.set_caption('Platformer')
 
 #define font
-font = pygame.font.SysFont('Bauhaus 93', 70)
-font_score = pygame.font.SysFont('Bauhaus 93', 30)
+font = pygame.font.SysFont('Bauhaus 93', (screen_width//14))
+font_score = pygame.font.SysFont('Bauhaus 93', (screen_width//33))
 
 scroll = [0, 0]
 
@@ -67,7 +67,7 @@ def draw_text(text, font, text_col, x, y):
 
 #funtion to reset level
 def reset_level(Level):
-    player.reset(100, screen_height - 130)
+    player.reset((tile_size*2), screen_height - (tile_size * 1.5))
     blob_group.empty()
     platform_group.empty()
     lava_group.empty()
@@ -116,7 +116,7 @@ class Player():
         dx = 0
         dy = 0
         walk_cooldown = 5
-        col_thresh = 20
+        col_thresh = (tile_size//2.5)
 
         if game_over == 0:
             #  get keypresses
@@ -128,11 +128,11 @@ class Player():
             if key[pygame.K_SPACE] == False:
                 self.jumped = False
             if key[pygame.K_LEFT]:
-                dx -= 5
+                dx -= (tile_size//10)
                 self.counter += 1
                 self.direction = -1
             if key[pygame.K_RIGHT]:
-                dx += 5
+                dx += (tile_size//10)
                 self.counter += 1
                 self.direction = 1
             if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
@@ -157,8 +157,8 @@ class Player():
 
             # gravity
             self.vel_y += 1  # positive = falling, negative = jumping(moving up)
-            if self.vel_y > 10:
-                self.vel_y = 10
+            if self.vel_y > (tile_size//5):
+                self.vel_y = (tile_size//5)
             dy += self.vel_y
 
             # Checking for collisions(blocks/world)
@@ -217,7 +217,7 @@ class Player():
 
         elif game_over == -1:
             self.image = self.dead_image
-            draw_text('Game Over!', font, blue, (screen_width // 2) - 200, screen_height // 2)
+            draw_text('Game Over!', font, blue, (screen_width // 2) - (tile_size*4), screen_height // 2)
             if self.rect.y > tile_size:
                 self.rect.y -= 5
 
@@ -235,7 +235,7 @@ class Player():
         self.counter = 0
         for num in range(1, 5):
             img_right = pygame.image.load(f'Images/img/guy{num}.png')
-            img_right = pygame.transform.scale(img_right, (40, 80))
+            img_right = pygame.transform.scale(img_right, ((tile_size//1.25), (tile_size//.625)))
             img_left = pygame.transform.flip(img_right, True, False)
             self.images_right.append(img_right)
             self.images_left.append(img_left)
@@ -323,6 +323,7 @@ class Enemy(pygame.sprite.Sprite):
         if abs(self.move_counter) > tile_size:
             self.move_direction *= -1
             self.move_counter *= -1
+            screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, move_x, move_y):
@@ -344,6 +345,7 @@ class Platform(pygame.sprite.Sprite):
         if abs(self.move_counter) > tile_size:
             self.move_direction *= -1
             self.move_counter *= -1
+        screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
 class Lava(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -352,6 +354,8 @@ class Lava(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+    def update(self):
+        screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
 class Coin(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -359,6 +363,8 @@ class Coin(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(img, (tile_size // 2, tile_size // 2))
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
+    def update(self):
+        screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
 class Exit(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -367,6 +373,8 @@ class Exit(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+    def update(self):
+        screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
 
 #instances
 player = Player(100, screen_height - 130)
@@ -389,9 +397,9 @@ if path.exists(f'Levels/level{level}_data'):
 world = World(world_data)
 
 #create buttons
-restart_button = Button(screen_width // 2 - 50, screen_height // 2 - 100, restart_img)
-start_button = Button(screen_width // 2 - 350, screen_height // 2, start_img)
-exit_button = Button(screen_width // 2 + 150, screen_height // 2, exit_img)
+restart_button = Button(screen_width // 2 - tile_size, screen_height // 2 - (tile_size-2), restart_img)
+start_button = Button(screen_width // 2 - (tile_size*7), screen_height // 2, start_img)
+exit_button = Button(screen_width // 2 + (tile_size*3), screen_height // 2, exit_img)
 
 
 # main game loop
@@ -417,17 +425,20 @@ while run:
         if game_over == 0: # prevents the blobs from moving when game is over(game_over = -1)
             blob_group.update()  # updates ALL "blob" (enemies)(in blob group)
             platform_group.update()
+            lava_group.update()
+            coin_group.update()
+            exit_group.update()
             #  update score - check if a coin has been collected
             if pygame.sprite.spritecollide(player, coin_group, True):
                 score += 1
                 coin_fx.play()
-            draw_text('X ' + str(score), font_score, white, tile_size - 10, 10)
+            draw_text('X ' + str(score), font_score, white, tile_size - (tile_size//5), (tile_size//5))
 
-        blob_group.draw(screen)
-        platform_group.draw(screen)
-        lava_group.draw(screen)
-        coin_group.draw(screen)
-        exit_group.draw(screen)
+        #blob_group.draw(screen)
+        #platform_group.draw(screen)
+        #lava_group.draw(screen)
+        #coin_group.draw(screen)
+        #exit_group.draw(screen)
 
         game_over = player.update(game_over)
 
@@ -450,7 +461,7 @@ while run:
                 world = reset_level(level) # deletes past level and creates new level then new world
                 game_over = 0
             else: # end of game
-                draw_text('You Win!', font, blue, (screen_width // 2) - 140, screen_height // 2)
+                draw_text('You Win!', font, blue, (screen_width // 2) - (tile_size*3), screen_height // 2)
                 #restarts game
                 if restart_button.draw():
                     level = 1
