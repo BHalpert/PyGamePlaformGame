@@ -24,6 +24,8 @@ pygame.display.set_caption('Platformer')
 font = pygame.font.SysFont('Bauhaus 93', 70)
 font_score = pygame.font.SysFont('Bauhaus 93', 30)
 
+scroll = [0, 0]
+
 #  define game variables
 tile_size = screen_width/20
 game_over = 0 # -1 = lost, 0 = nothing, 1 = won
@@ -162,10 +164,10 @@ class Player():
             # Checking for collisions(blocks/world)
             self.in_air = True
             for tile in world.tile_list:
-                # check for collinison in x direction
+                # check for collision in x direction
                 if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                     dx = 0
-                # check for collinision in y direction
+                # check for collision in y direction
                 if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
                     # check if below the ground(jumping)
                     if self.vel_y < 0:
@@ -177,15 +179,15 @@ class Player():
                         self.vel_y = 0
                         self.in_air = False
 
-            # check for collinsion with enenmies(game over)
+            # check for collision with enemies(game over)
             if pygame.sprite.spritecollide(self, blob_group, False): #  check player against blob groups
                 game_over = -1
                 game_over_fx.play()
-            # check for collinsion with lava(game over)
+            # check for collision with lava(game over)
             if pygame.sprite.spritecollide(self, lava_group, False): #  check player against lava groups
                 game_over = -1
                 game_over_fx.play()
-            # check collinsion with exit
+            # check collision with exit
             if pygame.sprite.spritecollide(self, exit_group, False): #  check player against lava groups
                 game_over = 1
 
@@ -220,7 +222,7 @@ class Player():
                 self.rect.y -= 5
 
         #  draw player onto screen(updating image)
-        screen.blit(self.image, self.rect)
+        screen.blit(self.image, (self.rect.x - scroll[0] , self.rect.y - scroll[1]))
         #pygame.draw.rect(screen, (255,255,255), self.rect, 2) # player rect visualized
 
         return game_over
@@ -263,6 +265,7 @@ class World():
         for row in data:
             col_count = 0
             for tile in row:
+                ##adds dirt to tile list
                 if tile == 1:
                     img = pygame.transform.scale(dirt_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
@@ -270,6 +273,7 @@ class World():
                     img_rect.y = row_count * tile_size
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
+                ##adds grass to tile list
                 if tile == 2:
                     img = pygame.transform.scale(grass_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
@@ -299,7 +303,8 @@ class World():
             row_count += 1
     def draw(self):  #  draws the tile_list from above(World constructor)
         for tile in self.tile_list:
-            screen.blit(tile[0], tile[1])
+            screen.blit(tile[0] , (tile[1].x - scroll[0], tile[1].y - scroll[1]))
+
             #pygame.draw.rect(screen, (255,255,255), tile[1], 2) # tile rect visualized
 
 class Enemy(pygame.sprite.Sprite):
@@ -397,6 +402,9 @@ while run:
 
     screen.blit(bg_img, (0,0))  # sky background
     screen.blit(sun_img, (100,100))
+
+    scroll[0] += (player.rect.x - scroll[0] - 120) / 15
+    scroll[1] += (player.rect.y - scroll[1] - 620) / 15
 
     if main_menu == True:
         if exit_button.draw() == True: # if exit clicked
