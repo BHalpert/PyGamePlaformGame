@@ -83,31 +83,31 @@ def draw_world():
 				if world_data[row][col] == 2:
 					#grass blocks
 					img = pygame.transform.scale(grass_img, (tile_size, tile_size))
-					screen.blit(img, (col * tile_size - main.scroll[0], row * tile_size - main.scroll[1]))
+					screen.blit(img, (col * tile_size, row * tile_size ))
 				if world_data[row][col] == 3:
 					#enemy blocks
 					img = pygame.transform.scale(blob_img, (tile_size, int(tile_size * 0.75)))
-					screen.blit(img, (col * tile_size - main.scroll[0], row * tile_size + (tile_size * 0.25) - main.scroll[1]))
+					screen.blit(img, (col * tile_size, row * tile_size + (tile_size * 0.25) ))
 				if world_data[row][col] == 4:
 					#horizontally moving platform
 					img = pygame.transform.scale(platform_x_img, (tile_size, tile_size // 2))
-					screen.blit(img, (col * tile_size - main.scroll[0], row * tile_size - main.scroll[1]))
+					screen.blit(img, (col * tile_size, row * tile_size ))
 				if world_data[row][col] == 5:
 					#vertically moving platform
 					img = pygame.transform.scale(platform_y_img, (tile_size, tile_size // 2))
-					screen.blit(img, (col * tile_size - main.scroll[0], row * tile_size - main.scroll[1]))
+					screen.blit(img, (col * tile_size, row * tile_size))
 				if world_data[row][col] == 6:
 					#lava
 					img = pygame.transform.scale(lava_img, (tile_size, tile_size // 2))
-					screen.blit(img, (col * tile_size - main.scroll[0], row * tile_size + (tile_size // 2) - main.scroll[1]))
+					screen.blit(img, (col * tile_size, row * tile_size + (tile_size // 2)))
 				if world_data[row][col] == 7:
 					#coin
 					img = pygame.transform.scale(coin_img, (tile_size // 2, tile_size // 2))
-					screen.blit(img, (col * tile_size + (tile_size // 4) - main.scroll[0], row * tile_size + (tile_size // 4) - main.scroll[1]))
+					screen.blit(img, (col * tile_size + (tile_size // 4), row * tile_size + (tile_size // 4)))
 				if world_data[row][col] == 8:
 					#exit
 					img = pygame.transform.scale(exit_img, (tile_size, int(tile_size * 1.5)))
-					screen.blit(img, (col * tile_size - main.scroll[0], row * tile_size - (tile_size // 2) - main.scroll[1]))
+					screen.blit(img, (col * tile_size), row * tile_size - (tile_size // 2))
 
 
 

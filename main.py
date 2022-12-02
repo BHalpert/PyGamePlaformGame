@@ -411,7 +411,7 @@ while run:
     screen.blit(bg_img, (0,0))  # sky background
     screen.blit(sun_img, (100,100))
 
-    scroll[0] += (player.rect.x - scroll[0] - 120) / 15
+    scroll[0] += (player.rect.x - scroll[0] - 500) / 15
     scroll[1] += (player.rect.y - scroll[1] - 620) / 15
 
     if main_menu == True:
