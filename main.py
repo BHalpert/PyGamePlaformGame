@@ -17,12 +17,12 @@ screen_width = 1000
 screen_height = 1000
 
 #  creates screen
-screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
+screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Platformer')
 
 #define font
 font = pygame.font.SysFont('Bauhaus 93', (screen_width//14))
-font_score = pygame.font.SysFont('Bauhaus 93', (screen_width//33))
+font_score = pygame.font.SysFont('Bauhaus 93', (screen_width//30))
 
 scroll = [0, 0]
 
@@ -30,7 +30,7 @@ scroll = [0, 0]
 tile_size = screen_width/20
 game_over = 0 # -1 = lost, 0 = nothing, 1 = won
 main_menu = True
-level = 0
+level = 4
 max_levels = 7
 score = 0
 
@@ -323,7 +323,8 @@ class Enemy(pygame.sprite.Sprite):
         if abs(self.move_counter) > tile_size:
             self.move_direction *= -1
             self.move_counter *= -1
-            screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
+        screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
+
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, move_x, move_y):
@@ -386,10 +387,6 @@ lava_group = pygame.sprite.Group()
 exit_group = pygame.sprite.Group()
 coin_group = pygame.sprite.Group()
 
-# create dummy coin for showing the score (not accesible by player for looks only)
-score_coin = Coin(tile_size // 2, tile_size // 2)
-coin_group.add(score_coin)
-
 # load in level data and create world
 if path.exists(f'Levels/level{level}_data'):
     pickle_in = open(f'Levels/level{level}_data', 'rb') #  rb = read data(binary)
@@ -432,7 +429,7 @@ while run:
             if pygame.sprite.spritecollide(player, coin_group, True):
                 score += 1
                 coin_fx.play()
-            draw_text('X ' + str(score), font_score, white, tile_size - (tile_size//5), (tile_size//5))
+            draw_text('Score: ' + str(score), font_score, white, tile_size - (tile_size//3), (tile_size//3))
 
         #blob_group.draw(screen)
         #platform_group.draw(screen)
