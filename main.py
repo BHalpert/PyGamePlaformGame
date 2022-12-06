@@ -53,9 +53,6 @@ RL = lava.get_rect()
 RS = slime.get_rect()
 RC = coin.get_rect()
 
-
-
-
 #  load images
 sun_img = pygame.image.load('Images/img/sun.png')
 bg_img = pygame.image.load('Images/img/sky.png')
