@@ -23,7 +23,7 @@ pygame.display.set_caption('Platformer')
 #define font
 font = pygame.font.SysFont('Bauhaus 93', (screen_width//14))
 font_score = pygame.font.SysFont('Bauhaus 93', (screen_width//30))
-
+vfont = pygame.font.SysFont('Bauhaus 93', (screen_width//40))
 
 
 
@@ -127,7 +127,7 @@ class Player():
         if game_over == 0:
             #  get keypresses
             key = pygame.key.get_pressed()
-            if (key[pygame.K_SPACE] or key[pygame.K_w]) and self.jumped == False and self.in_air == False:
+            if (key[pygame.K_SPACE] or key[pygame.K_w] or key[pygame.K_UP]) and self.jumped == False and self.in_air == False:
                 jump_fx.play()
                 self.vel_y = -15
                 self.jumped = True
@@ -141,7 +141,7 @@ class Player():
                 dx += (tile_size//10)
                 self.counter += 1
                 self.direction = 1
-            if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
+            if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False and key[pygame.K_a] == False and key[pygame.K_d] == False:
                 self.counter = 0
                 self.index = 0
                 #  keeps player facing the correct direction when stopped
@@ -407,18 +407,20 @@ exit_button = Button(screen_width // 2 + (tile_size*3), screen_height // 2, exit
 
 
 #tutorial text
-vfont = pygame.font.SysFont('Bauhaus 93', (screen_width//40))
-move = vfont.render('1. awd or arrow keys to move', True, white)
+move1 = vfont.render('1. awd or arrow keys to move', True, white)
+move2 = vfont.render('and space to jump', True, white)
 danger = vfont.render('2. Dont touch the Lava or Slimes!', True, white)
 coin = vfont.render('3. Get all the coins', True, white)
 fun = vfont.render('4. Have fun! :)', True, white)
 
-RM = move.get_rect()
+RM1 = move1.get_rect()
+RM2 = move2.get_rect()
 RD = danger.get_rect()
 RC = coin.get_rect()
 RF = fun.get_rect()
 
-RM.center = (1225 // 2, 950 // 2)
+RM1.center = (1225 // 2, 850 // 2)
+RM2.center = (1225 // 2, 950 // 2)
 RD.center = (1225 // 2, 1050 // 2)
 RC.center = (1225 // 2, 1150 // 2)
 RF.center = (1225 // 2, 1250 // 2)
@@ -437,7 +439,8 @@ while run:
 
 
     if (level == 0) and main_menu == False:
-        screen.blit(move, RM)
+        screen.blit(move1, RM1)
+        screen.blit(move2, RM2)
         screen.blit(danger, RD)
         screen.blit(coin, RC)
         screen.blit(fun, RF)
