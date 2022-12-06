@@ -436,7 +436,7 @@ while run:
     screen.blit(sun_img, (100, 100))
 
 
-    if (level == 0):
+    if (level == 0) and main_menu == False:
         screen.blit(move, RM)
         screen.blit(danger, RD)
         screen.blit(coin, RC)
