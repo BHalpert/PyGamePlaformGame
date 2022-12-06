@@ -32,7 +32,7 @@ scroll = [0, 0]
 tile_size = screen_width/20
 game_over = 0 # -1 = lost, 0 = nothing, 1 = won
 main_menu = True
-level = 4
+level = 0
 max_levels = 7
 score = 0
 
