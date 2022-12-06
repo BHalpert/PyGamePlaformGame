@@ -26,6 +26,8 @@ font_score = pygame.font.SysFont('Bauhaus 93', (screen_width//30))
 
 
 
+
+
 scroll = [0, 0]
 
 #  define game variables
@@ -40,18 +42,7 @@ score = 0
 white = (255, 255, 255)
 blue = (0, 0, 255)
 
-#tutorial text
-move = font.render('use awd or arrow keys for movement', True, white, blue)
-jump = font.render('use w, space, or up to jump', True, white, blue)
-lava = font.render('Dont touch the Lava!', True, white, blue)
-slime = font.render('Watchout for Slimes!', True, white, blue)
-coin = font.render('Make sure you collect all the coins...but if you die you lose em', True, white, blue)
 
-RM = move.get_rect()
-RJ = jump.get_rect()
-RL = lava.get_rect()
-RS = slime.get_rect()
-RC = coin.get_rect()
 
 #  load images
 sun_img = pygame.image.load('Images/img/sun.png')
@@ -415,14 +406,41 @@ exit_button = Button(screen_width // 2 + (tile_size*3), screen_height // 2, exit
 
 
 
+#tutorial text
+vfont = pygame.font.SysFont('Bauhaus 93', (screen_width//40))
+move = vfont.render('1. awd or arrow keys to move', True, white)
+danger = vfont.render('2. Dont touch the Lava or Slimes!', True, white)
+coin = vfont.render('3. Get all the coins', True, white)
+fun = vfont.render('4. Have fun! :)', True, white)
+
+RM = move.get_rect()
+RD = danger.get_rect()
+RC = coin.get_rect()
+RF = fun.get_rect()
+
+RM.center = (1225 // 2, 950 // 2)
+RD.center = (1225 // 2, 1050 // 2)
+RC.center = (1225 // 2, 1150 // 2)
+RF.center = (1225 // 2, 1250 // 2)
+
+
+
+
 # main game loop
 run = True
 while run:
 
     clock.tick(fps)
+    screen.blit(bg_img, (0, 0))  # sky background
 
-    screen.blit(bg_img, (0,0))  # sky background
-    screen.blit(sun_img, (100,100))
+    screen.blit(sun_img, (100, 100))
+
+
+    if (level == 0):
+        screen.blit(move, RM)
+        screen.blit(danger, RD)
+        screen.blit(coin, RC)
+        screen.blit(fun, RF)
 
     scroll[0] += (player.rect.x - scroll[0] - 500) / 15
     scroll[1] += (player.rect.y - scroll[1] - 620) / 15
