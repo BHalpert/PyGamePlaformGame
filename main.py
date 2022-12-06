@@ -24,6 +24,8 @@ pygame.display.set_caption('Platformer')
 font = pygame.font.SysFont('Bauhaus 93', (screen_width//14))
 font_score = pygame.font.SysFont('Bauhaus 93', (screen_width//30))
 
+
+
 scroll = [0, 0]
 
 #  define game variables
@@ -37,6 +39,22 @@ score = 0
 #define colors
 white = (255, 255, 255)
 blue = (0, 0, 255)
+
+#tutorial text
+move = font.render('use awd or arrow keys for movement', True, white, blue)
+jump = font.render('use w, space, or up to jump', True, white, blue)
+lava = font.render('Dont touch the Lava!', True, white, blue)
+slime = font.render('Watchout for Slimes!', True, white, blue)
+coin = font.render('Make sure you collect all the coins...but if you die you lose em', True, white, blue)
+
+RM = move.get_rect()
+RJ = jump.get_rect()
+RL = lava.get_rect()
+RS = slime.get_rect()
+RC = coin.get_rect()
+
+
+
 
 #  load images
 sun_img = pygame.image.load('Images/img/sun.png')
@@ -121,17 +139,17 @@ class Player():
         if game_over == 0:
             #  get keypresses
             key = pygame.key.get_pressed()
-            if key[pygame.K_SPACE] and self.jumped == False and self.in_air == False:
+            if (key[pygame.K_SPACE] or key[pygame.K_w]) and self.jumped == False and self.in_air == False:
                 jump_fx.play()
                 self.vel_y = -15
                 self.jumped = True
             if key[pygame.K_SPACE] == False:
                 self.jumped = False
-            if key[pygame.K_LEFT]:
+            if key[pygame.K_LEFT] or key[pygame.K_a]:
                 dx -= (tile_size//10)
                 self.counter += 1
                 self.direction = -1
-            if key[pygame.K_RIGHT]:
+            if key[pygame.K_RIGHT] or key[pygame.K_d]:
                 dx += (tile_size//10)
                 self.counter += 1
                 self.direction = 1
@@ -397,6 +415,7 @@ world = World(world_data)
 restart_button = Button(screen_width // 2 - tile_size, screen_height // 2 - (tile_size-2), restart_img)
 start_button = Button(screen_width // 2 - (tile_size*7), screen_height // 2, start_img)
 exit_button = Button(screen_width // 2 + (tile_size*3), screen_height // 2, exit_img)
+
 
 
 # main game loop
