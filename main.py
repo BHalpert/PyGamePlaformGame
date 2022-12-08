@@ -216,34 +216,28 @@ class Player():
             if pygame.sprite.spritecollide(self, exit_group, False): #  check player against lava groups
                 game_over = 1
 
-            #collision with moving platforms
-            for platform in platform_group:
-                #collision in x direction
-                if platform.rect.colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+            for platform in platform_group: #collision with moving platforms
+                if platform.rect.colliderect(self.rect.x + dx, self.rect.y, self.width, self.height): #collision with moving platforms in x direction
                     dx = 0
-                #collision in y direction
-                if platform.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-                    #check if below platform
-                    if abs((self.rect.top + dy) - platform.rect.bottom) < col_thresh:
+                if platform.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height): #checks player collision in y direction with moving platforms
+                    if abs((self.rect.top + dy) - platform.rect.bottom) < col_thresh: #checks if player is below moving platform
                         self.vel_y = 0
                         dy = platform.rect.bottom - self.rect.top
-                    #check if above platform
-                    elif abs((self.rect.bottom + dy) - platform.rect.top) < col_thresh:
+                    elif abs((self.rect.bottom + dy) - platform.rect.top) < col_thresh: #checks if player is above moving platform
                         self.rect.bottom = platform.rect.top - 1
                         self.in_air = False
                         dy = 0
-                    #move sideways with platform when changing from vertical to horizontal platform
-                    if platform.move_x != 0:
+                    if platform.move_x != 0: #player moves sideways with platform when changing from vertical to horizontal platform
                         self.rect.x += platform.move_direction
 
             # Update Player coordinates
             self.rect.x += dx
             self.rect.y += dy
 
-        elif game_over == -1:
+        elif game_over == -1: # when player dies
             self.image = self.dead_image
             draw_text('Game Over!', font, blue, (screen_width // 2) - (tile_size*2.75), screen_height // 2)
-            if self.rect.y > tile_size:
+            if self.rect.y > tile_size: #stops ghost image & animation from going past tile border at the top of the screen
                 self.rect.y -= 5
 
         #  draw player onto screen(updating image)
@@ -258,7 +252,7 @@ class Player():
         self.images_left = []
         self.index = 0
         self.counter = 0
-        for num in range(1, 5):
+        for num in range(1, 5): #animation of player image - traverses the 4 different player images
             img_right = pygame.image.load(f'Images/img/guy{num}.png')
             img_right = pygame.transform.scale(img_right, ((tile_size//1.25), (tile_size//.625)))
             img_left = pygame.transform.flip(img_right, True, False)
@@ -282,47 +276,44 @@ class World():
     def __init__(self, data):
         self.tile_list = []
 
-        #  load images
+        #  load images of dirt and grass tiles
         dirt_img = pygame.image.load('Images/img/dirt.png')
         grass_img = pygame.image.load('Images/img/grass.png')
 
-        #  any place in the array with a 1 will be dirt
         row_count = 0
-        for row in data:
+        for row in data: # traverses all rows in daa
             col_count = 0
-            for tile in row:
-                ##adds dirt to tile list
-                if tile == 1:
+            for tile in row: #traverses all the tiles in each tow
+                if tile == 1: # places dirt tile in level where there are 1 in the world data array(in the external level file)
                     img = pygame.transform.scale(dirt_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * tile_size
                     img_rect.y = row_count * tile_size
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
-                ##adds grass to tile list
-                if tile == 2:
+                if tile == 2: # places grass tile in level where there are 2 in the world data array(in the external level file)
                     img = pygame.transform.scale(grass_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * tile_size
                     img_rect.y = row_count * tile_size
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
-                if tile == 3:
+                if tile == 3: # places enemy/blob in level where there are 3 in the world data array(in the external level file)
                     blob = Enemy(col_count * tile_size, row_count * tile_size + tile_size/3)
                     blob_group.add(blob)
-                if tile == 4: # horizontal platform
+                if tile == 4: # places horizontal moving platform in level where there are 4 in the world data array(in the external level file)
                     platform = Platform(col_count * tile_size, row_count * tile_size, 1, 0)
                     platform_group.add(platform)
-                if tile == 5: # vertical platform
+                if tile == 5: # places vertical moving platform in level where there are 5 in the world data array(in the external level file)
                     platform = Platform(col_count * tile_size, row_count * tile_size, 0, 1)
                     platform_group.add(platform)
-                if tile == 6:
+                if tile == 6: # places lava in level where there are 6 in the world data array(in the external level file)
                     lava = Lava(col_count * tile_size, row_count * tile_size + (tile_size//2))
                     lava_group.add(lava)
-                if tile == 7:
+                if tile == 7: # places coins in level where there are 7 in the world data array(in the external level file)
                     coin = Coin(col_count * tile_size + (tile_size // 2), row_count * tile_size + (tile_size // 2))
                     coin_group.add(coin)
-                if tile == 8:
+                if tile == 8: # places exit door in level where there are 8 in the world data array(in the external level file)
                     exit = Exit(col_count * tile_size, row_count * tile_size - (tile_size // 2))
                     exit_group.add(exit)
                 col_count += 1
@@ -343,16 +334,16 @@ class Enemy(pygame.sprite.Sprite):
         self.move_direction = 1
         self.move_counter = 0
 
-    def update(self):
+    def update(self): # updates image as player moves & moves the images of the enemy/blob
         self.rect.x += self.move_direction
         self.move_counter += 1
-        if abs(self.move_counter) > tile_size:
+        if abs(self.move_counter) > tile_size: # changes direction of enemy/blob when it reaches the end of its movement range(ie. 1 tile)
             self.move_direction *= -1
             self.move_counter *= -1
         screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
 
 
-class Platform(pygame.sprite.Sprite):
+class Platform(pygame.sprite.Sprite): # moving platforms(horizontal & vertical)
     def __init__(self, x, y, move_x, move_y):
         pygame.sprite.Sprite.__init__(self)
         img = pygame.image.load('Images/img/platform.png')
@@ -365,11 +356,11 @@ class Platform(pygame.sprite.Sprite):
         self.move_x = move_x
         self.move_y = move_y
 
-    def update(self):
+    def update(self): # updates image as player moves & moves the images of the moving platforms
         self.rect.x += self.move_direction * self.move_x
         self.rect.y += self.move_direction * self.move_y
         self.move_counter += 1
-        if abs(self.move_counter) > tile_size:
+        if abs(self.move_counter) > tile_size: # changes direction of moving platforms when it reaches the end of its movement range(ie. 1 tile)
             self.move_direction *= -1
             self.move_counter *= -1
         screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
@@ -381,7 +372,7 @@ class Lava(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-    def update(self):
+    def update(self): # updates image as player moves
         screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
 class Coin(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -390,9 +381,9 @@ class Coin(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(img, (tile_size // 2, tile_size // 2))
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
-    def update(self):
+    def update(self): # updates image as player moves
         screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
-class Exit(pygame.sprite.Sprite):
+class Exit(pygame.sprite.Sprite): # level exit
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         img = pygame.image.load('Images/img/exit.png')
@@ -400,7 +391,7 @@ class Exit(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-    def update(self):
+    def update(self): # updates image as player moves
         screen.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
 
 #instances
@@ -414,7 +405,7 @@ exit_group = pygame.sprite.Group()
 coin_group = pygame.sprite.Group()
 
 # load in level data and create world
-if path.exists(f'Levels/level{level}_data'):
+if path.exists(f'Levels/level{level}_data'): # pulls file with data to generate the correct level
     pickle_in = open(f'Levels/level{level}_data', 'rb') #  rb = read data(binary)
     world_data = pickle.load(pickle_in)
 world = World(world_data)
@@ -448,9 +439,9 @@ RF.center = (1225 // 2, 1250 // 2)
 
 
 
-# main game loop
+
 run = True
-while run:
+while run: # main game loop, always run until user quits/exits
 
     clock.tick(fps)
     screen.blit(bg_img, (0, 0))  # sky background
@@ -458,7 +449,7 @@ while run:
     screen.blit(sun_img, (100, 100))
 
 
-    if (level == 0) and main_menu == False:
+    if (level == 0) and main_menu == False: # displays text for intructions/turorial on the first level
         screen.blit(move1, RM1)
         screen.blit(move2, RM2)
         screen.blit(danger, RD)
@@ -468,12 +459,12 @@ while run:
     scroll[0] += (player.rect.x - scroll[0] - 500) / 15
     scroll[1] += (player.rect.y - scroll[1] - 620) / 15
 
-    if main_menu == True:
+    if main_menu == True: # displays mainmenu
         if exit_button.draw() == True: # if exit clicked
             run = False
         if start_button.draw() == True: # if start clicked
             main_menu = False
-    else: #  main_menu == False
+    else: # main_menu == False # displays gameplay and levels
         world.draw() # adds world on top of background and sun
 
         if game_over == 0: # prevents the blobs from moving when game is over(game_over = -1)
@@ -488,46 +479,37 @@ while run:
                 coin_fx.play()
             draw_text('Score: ' + str(score), font_score, white, tile_size - (tile_size//3), (tile_size//3))
 
-        #blob_group.draw(screen)
-        #platform_group.draw(screen)
-        #lava_group.draw(screen)
-        #coin_group.draw(screen)
-        #exit_group.draw(screen)
-
         game_over = player.update(game_over)
 
         #draw_grid()
 
-        # If player has died
-        if game_over == -1:
+        if game_over == -1: # If player has died
             if restart_button.draw():
                 world_data = []  # clearing current world data
                 world = reset_level(level)  # deletes past level and creates new level then new world
                 game_over = 0
                 score = 0
-        # if player has completed level
-        if game_over == 1:
+        if game_over == 1: # if player has completed level
             #reset game and go to next level
             level += 1 # increase level by 1
-            if level <= max_levels:
+            if level <= max_levels: # runs if there are still more levels(I.e. not on final level)
                 #reset level
                 world_data = [] # clearing current world data
                 world = reset_level(level) # deletes past level and creates new level then new world
                 game_over = 0
             else: # end of game
                 draw_text('You Win!', font, blue, (screen_width // 2) - (tile_size*3), screen_height // 2)
-                #restarts game
-                if restart_button.draw():
+                if restart_button.draw(): #restarts game
                     level = 1
                     world_data = []  # clearing current world data
                     world = reset_level(level)  # deletes past level and creates new level then new world
                     game_over = 0
                     score = 0
     pygame.event.pump()
-    for event in pygame.event.get():
+    for event in pygame.event.get(): # runs while the game is open
         if event.type == pygame.QUIT:  # quits game when close window button(X) is clicked
             run = False
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN: # if the key is pressed
             if event.key == pygame.K_ESCAPE: # quits game when esc is pressed
                 run = False
         elif event.type == VIDEORESIZE: # non fullscreen resizing
