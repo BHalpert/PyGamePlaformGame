@@ -64,6 +64,7 @@ def draw_text(text, font, text_col, x, y):
 	img = font.render(text, True, text_col)
 	screen.blit(img, (x, y))
 
+#creates gridlines scene on level editor
 def draw_grid():
 	for c in range(21):
 		#vertical lines
@@ -71,9 +72,11 @@ def draw_grid():
 		#horizontal lines
 		pygame.draw.line(screen, white, (0, c * tile_size), (screen_width, c * tile_size))
 
-
+#formats all the images for editing
 def draw_world():
+	#runs through each box by rows
 	for row in range(20):
+		# runs through each box by rows
 		for col in range(20):
 			if world_data[row][col] > 0:
 				if world_data[row][col] == 1:
@@ -110,17 +113,16 @@ def draw_world():
 					screen.blit(img, ((col * tile_size), row * tile_size - (tile_size // 2)))
 
 
-
+#sets up the buttons
 class Button():
 	def __init__(self, x, y, image):
 		self.image = image
 		self.rect = self.image.get_rect()
 		self.rect.topleft = (x, y)
 		self.clicked = False
-
+	#puts stuff on the screen
 	def draw(self):
 		action = False
-
 		#get mouse position
 		pos = pygame.mouse.get_pos()
 
@@ -130,6 +132,7 @@ class Button():
 				action = True
 				self.clicked = True
 
+		#if you did not left click, nothing happens
 		if pygame.mouse.get_pressed()[0] == 0:
 			self.clicked = False
 
@@ -191,18 +194,24 @@ while run:
 				#update tile value
 				if pygame.mouse.get_pressed()[0] == 1:
 					world_data[y][x] += 1
+					#resets tile back to nothing
 					if world_data[y][x] > 8:
 						world_data[y][x] = 0
+				#if user right clicks, tile selection goes backwards
 				elif pygame.mouse.get_pressed()[2] == 1:
 					world_data[y][x] -= 1
+					#if you try to rotate to the previosus tile on nothing, cycle back to last tile option
 					if world_data[y][x] < 0:
 						world_data[y][x] = 8
+		#turns clicked to false after key is released
 		if event.type == pygame.MOUSEBUTTONUP:
 			clicked = False
 		#up and down key presses to change level number
 		if event.type == pygame.KEYDOWN:
+			#if user presses up, move to a higher level. if they press down, you go down
 			if event.key == pygame.K_UP:
 				level += 1
+			#if user wants to cycle back to a lower level, they can when clicking the down arrow
 			elif event.key == pygame.K_DOWN and level > 1:
 				level -= 1
 

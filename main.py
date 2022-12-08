@@ -128,7 +128,7 @@ class Player():
         dy = 0
         walk_cooldown = 5
         col_thresh = (tile_size//2.5)
-
+        #checks whether game is still running
         ## if the game is not over get the key being pressed
         if game_over == 0:
             #  get keypresses
@@ -277,6 +277,7 @@ class Player():
         self.direction = 0
         self.in_air = True
 
+#creates different block types
 class World():
     def __init__(self, data):
         self.tile_list = []
