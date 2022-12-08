@@ -67,11 +67,12 @@ def draw_grid():
         pygame.draw.line(screen, (255,255,255), (0, line * tile_size), (screen_width, line * tile_size))
         pygame.draw.line(screen, (255,255,255), (line * tile_size, 0), (line * tile_size, screen_height))
 
+# draws introduction text to the screen
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col) # turns text into picture
     screen.blit(img, (x,y))
 
-#funtion to reset level
+# this function resets levels by emptying all sprite groups
 def reset_level(Level):
     player.reset((tile_size*2), screen_height - (tile_size * 1.5))
     blob_group.empty()
@@ -95,6 +96,7 @@ class Button():
         self.rect.y = y
         self.clicked = False # tracks if mouse button is clicked
 
+    # draws the buttons to the screen and returns whether the player has clicked the start button or not
     def draw(self):
         action = False
 
@@ -102,11 +104,13 @@ class Button():
         pos = pygame.mouse.get_pos()
 
         # check mouseover and clicked conditions
-        if self.rect.collidepoint(pos): # when the mouse if over the restart button
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False: # [0] = left mouse button clicked
+        if self.rect.collidepoint(pos): # if the mouse is over the restart button
+            # checks if button is clicked, [0] = left mouse button clicked
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 action = True
                 self.clicked = True
 
+        ## checks if left mouse button does not press button
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 
@@ -118,29 +122,36 @@ class Player():
     def __init__(self, x, y):
         self.reset(x,y)
 
+    # updates the position of the player based off of keystrokes and velocity variables
     def update(self, game_over):
         dx = 0
         dy = 0
         walk_cooldown = 5
         col_thresh = (tile_size//2.5)
 
+        ## if the game is not over get the key being pressed
         if game_over == 0:
             #  get keypresses
             key = pygame.key.get_pressed()
+            # if the key being pressed is space of W or up and player is not already in the air, then set jumped to true
             if (key[pygame.K_SPACE] or key[pygame.K_w] or key[pygame.K_UP]) and self.jumped == False and self.in_air == False:
                 jump_fx.play()
                 self.vel_y = -15
                 self.jumped = True
-            if key[pygame.K_SPACE] == False:
+            # if space, w, or up is not being pressed then set jumped to false
+            if (key[pygame.K_SPACE] or key[pygame.K_w] or key[pygame.K_UP]) == False:
                 self.jumped = False
+            # if left or a is being pressed, then set the dx to a negative tile size
             if key[pygame.K_LEFT] or key[pygame.K_a]:
                 dx -= (tile_size//10)
                 self.counter += 1
                 self.direction = -1
+            # if right or d is being pressed, then set the dx to a positive tile size
             if key[pygame.K_RIGHT] or key[pygame.K_d]:
                 dx += (tile_size//10)
                 self.counter += 1
                 self.direction = 1
+            # if left, right, a, or d is not being pressed then counter and index to 0
             if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False and key[pygame.K_a] == False and key[pygame.K_d] == False:
                 self.counter = 0
                 self.index = 0
@@ -150,36 +161,44 @@ class Player():
                 if self.direction == -1:
                     self.image = self.images_left[self.index]
 
-            #handles animation of player
+            #if the number of pixels the player is moving for is greater than the walk cooldown
+            # then cycle through the animation iamges
             if self.counter > walk_cooldown:
                 self.counter = 0
                 self.index += 1
+                # if index is greater than number of images then reset the index to 0
                 if self.index >= len(self.images_right):
                     self.index = 0
+                # if direction is one then cycle through right images
                 if self.direction == 1:
                     self.image = self.images_right[self.index]
+                # if direction is -1 then cycle through left images
                 if self.direction == -1:
                     self.image = self.images_left[self.index]
 
             # gravity
             self.vel_y += 1  # positive = falling, negative = jumping(moving up)
+            # if velocity in y direction is greater than tile size divided by five, then set the velocity to its max
             if self.vel_y > (tile_size//5):
                 self.vel_y = (tile_size//5)
             dy += self.vel_y
 
             # Checking for collisions(blocks/world)
             self.in_air = True
+            # traverses through the number of tiles in tile list
             for tile in world.tile_list:
-                # check for collision in x direction
+                # check for collision in x direction with tile 1
                 if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                     dx = 0
-                # check for collision in y direction
+                # check for collision in y direction with tile 1
                 if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
                     # check if below the ground(jumping)
+                    # if the velocity in y direction is less than 0 set vel y to 0, the dy is the change
+                    # from the top of the player to bottom of the block (hitting head while jumping)
                     if self.vel_y < 0:
                         dy = tile[1].bottom - self.rect.top
                         self.vel_y = 0
-                    # check if above the ground(falling/gravity)
+                    # check if the player is above the ground(falling/gravity)
                     elif self.vel_y >= 0:
                         dy = tile[1].top - self.rect.bottom
                         self.vel_y = 0
@@ -223,7 +242,7 @@ class Player():
 
         elif game_over == -1:
             self.image = self.dead_image
-            draw_text('Game Over!', font, blue, (screen_width // 2) - (tile_size*4), screen_height // 2)
+            draw_text('Game Over!', font, blue, (screen_width // 2) - (tile_size*2.75), screen_height // 2)
             if self.rect.y > tile_size:
                 self.rect.y -= 5
 
@@ -248,7 +267,7 @@ class Player():
         self.dead_image = pygame.image.load('Images/img/ghost.png')
         self.image = self.images_right[self.index]
         self.rect = self.image.get_rect()
-        #  Coordanites and Movement
+        #  Coordinates and Movement
         self.rect.x = x
         self.rect.y = y
         self.width = self.image.get_width()
